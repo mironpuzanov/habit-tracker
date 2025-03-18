@@ -6,7 +6,6 @@ const nextConfig: NextConfig = {
   experimental: {
     serverComponentsExternalPackages: [],
     appDocumentPreloading: false,
-    optimizeCss: true,
     forceSwcTransforms: true
   }
 };
