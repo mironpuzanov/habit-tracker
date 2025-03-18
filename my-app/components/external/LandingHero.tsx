@@ -11,14 +11,14 @@ export default function LandingHero({
   subtitle = "Build better habits and achieve your goals with our simple habit tracking app."
 }: LandingHeroProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-4 text-center gap-6">
-      <h1 className="text-4xl sm:text-5xl font-bold">{title}</h1>
-      <p className="text-xl text-foreground/70 max-w-2xl">{subtitle}</p>
-      <div className="flex gap-4 mt-6">
-        <Button asChild variant="default" size="lg">
+    <div className="flex flex-col items-center justify-center py-8 sm:py-16 px-4 text-center gap-4 sm:gap-6 w-full">
+      <h1 className="text-3xl sm:text-5xl font-bold leading-tight">{title}</h1>
+      <p className="text-lg sm:text-xl text-foreground/70 max-w-2xl">{subtitle}</p>
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4 sm:mt-6 w-full sm:w-auto">
+        <Button asChild variant="default" size="lg" className="w-full sm:w-auto">
           <Link href="/external/sign-up">Get Started</Link>
         </Button>
-        <Button asChild variant="outline" size="lg">
+        <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
           <Link href="/external/sign-in">Sign In</Link>
         </Button>
       </div>
