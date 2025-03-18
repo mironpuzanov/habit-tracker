@@ -18,6 +18,7 @@ export default function HomePage() {
 
         <div className="flex flex-col gap-20 max-w-5xl p-5 w-full">
           <div className="flex-1 w-full flex flex-col gap-20 items-center">
+            <h1 className="text-4xl font-bold mb-8">Welcome to Habit Tracker</h1>
             <LandingHero />
           </div>
         </div>
