@@ -6,143 +6,127 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { SmtpMessage } from "../smtp-message";
 import { createClient } from "@/utils/supabase/client";
+import { useRouter } from "next/navigation";
 
-// @ts-ignore - bypass NextJS type checking issues
 export default function Page(props: any) {
-  const searchParams = props.searchParams || {};
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState<{
-    type: "idle" | "loading" | "success" | "error";
-    message?: string;
-  }>({ type: "idle" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Extract success/error messages from search params
-  const successMessage = 
-    searchParams.success && 
-    (typeof searchParams.success === 'string' 
-      ? searchParams.success 
-      : searchParams.success[0]);
-    
-  const errorMessage = 
-    searchParams.error && 
-    (typeof searchParams.error === 'string' 
-      ? searchParams.error 
-      : searchParams.error[0]);
-
-  // Handle success message from URL params
-  if (successMessage) {
-    return (
-      <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 p-4">
-        <div className="text-center mb-4">
-          <h2 className="text-2xl font-bold mb-2">Thanks for signing up!</h2>
-          <p>Please check your email for a verification link.</p>
-        </div>
-        <FormMessage message={{ success: successMessage }} />
-        <div className="mt-4">
-          <Link className="text-primary underline" href="/external/sign-in">
-            Return to sign in
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Client-side sign-up handler
+  // Ultra simple signup handler
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus({ type: "loading" });
+    setLoading(true);
+    setError("");
+    setSuccess("");
 
     try {
-      // Create a client-side Supabase client
       const supabase = createClient();
-      console.log("Signing up with:", email);
-
-      // Attempt to sign up
+      
+      // Absolute minimal signup - no options, no redirects
       const { data, error } = await supabase.auth.signUp({
         email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
+        password
       });
 
+      console.log("Signup response:", data, error);
+
       if (error) {
-        console.error("Sign-up error:", error);
-        setStatus({ 
-          type: "error", 
-          message: error.message || "Failed to sign up. Please try again." 
+        setError(error.message);
+      } else if (data?.user) {
+        setSuccess("Account created successfully! Redirecting to dashboard...");
+        
+        // Try to sign in directly
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
         });
-      } else {
-        console.log("Sign-up success:", data);
-        setStatus({ 
-          type: "success", 
-          message: "Thanks for signing up! Please check your email for a verification link." 
-        });
+        
+        if (!signInError) {
+          // Redirect to dashboard on success
+          setTimeout(() => router.push("/app/dashboard"), 1000);
+        } else {
+          setSuccess("Account created! Please sign in.");
+          setTimeout(() => router.push("/external/sign-in"), 1000);
+        }
       }
     } catch (err) {
-      console.error("Sign-up exception:", err);
-      setStatus({ 
-        type: "error", 
-        message: "An unexpected error occurred. Please try again." 
-      });
+      console.error("Signup exception:", err);
+      setError("An unexpected error occurred");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <form onSubmit={handleSignUp} className="flex flex-col min-w-64 max-w-64 mx-auto">
-        <h1 className="text-2xl font-medium">Sign up</h1>
-        <p className="text-sm text text-foreground">
-          Already have an account?{" "}
-          <Link className="text-primary font-medium underline" href="/external/sign-in">
-            Sign in
-          </Link>
-        </p>
-        <div className="flex flex-col gap-2 [&>input]:mb-3 mt-8">
-          <Label htmlFor="email">Email</Label>
-          <Input 
-            id="email"
-            name="email" 
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com" 
-            required 
-          />
-          <Label htmlFor="password">Password</Label>
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Your password"
-            minLength={6}
-            required
-          />
-          <Button 
-            type="submit"
-            disabled={status.type === "loading"}
-          >
-            {status.type === "loading" ? "Signing up..." : "Sign up"}
-          </Button>
-          
-          {/* Display status messages */}
-          {status.type === "error" && status.message && (
-            <FormMessage message={{ error: status.message }} />
-          )}
-          {status.type === "success" && status.message && (
-            <FormMessage message={{ success: status.message }} />
-          )}
-          {errorMessage && (
-            <FormMessage message={{ error: errorMessage }} />
-          )}
-        </div>
-      </form>
-      <SmtpMessage />
-    </>
+    <div className="flex justify-center items-center min-h-[60vh]">
+      <div className="w-full max-w-md p-6">
+        <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
+        
+        {success ? (
+          <div className="text-center mb-4 p-4 bg-green-100 dark:bg-green-900 rounded">
+            <p className="text-green-700 dark:text-green-300">{success}</p>
+            <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline mt-2 inline-block">
+              Sign in
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="mt-1"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                minLength={6}
+                required
+                className="mt-1"
+              />
+              <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
+            </div>
+            
+            {error && (
+              <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-3 rounded">
+                {error}
+              </div>
+            )}
+            
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? "Creating Account..." : "Sign Up"}
+            </Button>
+            
+            <p className="text-center text-sm">
+              Already have an account?{" "}
+              <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
+                Sign in
+              </Link>
+            </p>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }
