@@ -9,16 +9,7 @@ const nextConfig: NextConfig = {
     forceSwcTransforms: true
   },
   // Define which extensions to include in the build
-  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
-  // Add rewrites to handle the (external) routes
-  async rewrites() {
-    return [
-      {
-        source: '/external-routes/:path*',
-        destination: '/(external)/:path*'
-      }
-    ];
-  }
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx']
 };
 
 export default nextConfig;
