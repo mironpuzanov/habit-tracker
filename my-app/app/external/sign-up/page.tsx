@@ -74,13 +74,15 @@ export default function Page(props: any) {
         {success ? (
           <div className="text-center mb-4 p-3 sm:p-4 bg-green-100 dark:bg-green-900 rounded">
             <p className="text-green-700 dark:text-green-300">{success}</p>
-            <p className="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400">
-              After confirming your email, you can{" "}
-              <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
-                sign in
-              </Link>
-              {" "}to your account.
-            </p>
+            {!success.includes("Redirecting") && (
+              <p className="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400">
+                After confirming your email, you can{" "}
+                <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
+                  sign in
+                </Link>
+                {" "}to your account.
+              </p>
+            )}
           </div>
         ) : (
           <form onSubmit={handleSignUp} className="space-y-4">
