@@ -7,6 +7,17 @@ const nextConfig: NextConfig = {
     serverComponentsExternalPackages: [],
     appDocumentPreloading: false,
     forceSwcTransforms: true
+  },
+  // Define which extensions to include in the build
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
+  // Add rewrites to handle the (external) routes
+  async rewrites() {
+    return [
+      {
+        source: '/external-routes/:path*',
+        destination: '/(external)/:path*'
+      }
+    ];
   }
 };
 
