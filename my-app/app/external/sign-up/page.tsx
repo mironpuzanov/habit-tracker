@@ -17,7 +17,7 @@ export default function Page(props: any) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Ultra simple signup handler
+  // Simple signup handler with direct redirection
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -37,26 +37,22 @@ export default function Page(props: any) {
       if (error) {
         setError(error.message);
       } else if (data?.user) {
-        // Handle both confirmation modes
-        if (data.user.identities?.[0]?.identity_data?.email_confirmed_at) {
-          // Email confirmation is disabled, user is already confirmed
-          setSuccess("Account created! Signing you in now...");
-          // Auto sign-in since confirmation is disabled
-          const { error: signInError } = await supabase.auth.signInWithPassword({
-            email,
-            password
-          });
-          
-          if (!signInError) {
-            setTimeout(() => router.push("/app/dashboard"), 1500);
-          } else {
-            setSuccess("Account created! Please sign in.");
-            setTimeout(() => router.push("/external/sign-in"), 1500);
-          }
-        } else {
-          // Email confirmation is enabled
-          setSuccess("Account created successfully! Please check your email for confirmation link.");
+        // Set success message
+        setSuccess("Account created successfully! Redirecting to dashboard...");
+        
+        // Try to sign in immediately
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        
+        if (signInError) {
+          console.error("Auto sign-in failed:", signInError);
+          // Still redirect to dashboard - they can sign in there if needed
         }
+        
+        // Redirect to dashboard after a short delay
+        setTimeout(() => router.push("/app/dashboard"), 1500);
       }
     } catch (err) {
       console.error("Signup exception:", err);
@@ -74,15 +70,6 @@ export default function Page(props: any) {
         {success ? (
           <div className="text-center mb-4 p-3 sm:p-4 bg-green-100 dark:bg-green-900 rounded">
             <p className="text-green-700 dark:text-green-300">{success}</p>
-            {!success.includes("Signing you in") && !success.includes("Please sign in") && (
-              <p className="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400">
-                After confirming your email, you can{" "}
-                <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
-                  sign in
-                </Link>
-                {" "}to your account.
-              </p>
-            )}
           </div>
         ) : (
           <form onSubmit={handleSignUp} className="space-y-4">
