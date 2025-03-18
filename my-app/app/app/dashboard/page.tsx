@@ -102,9 +102,17 @@ export default function DashboardPage() {
           grouped[stat.category].push(stat);
         });
         
-        // Sort each category's habits alphabetically
+        // Sort each category's habits by type first, then by name
+        const typeOrder = { checkbox: 1, duration: 2, rating: 3 };
         Object.keys(grouped).forEach(category => {
-          grouped[category].sort((a, b) => a.name.localeCompare(b.name));
+          grouped[category].sort((a, b) => {
+            // First sort by type
+            const typeComparison = typeOrder[a.type] - typeOrder[b.type];
+            if (typeComparison !== 0) return typeComparison;
+            
+            // Then sort by name
+            return a.name.localeCompare(b.name);
+          });
         });
         
         setGroupedStats(grouped);
@@ -136,30 +144,30 @@ export default function DashboardPage() {
   const hasStats = sortedCategories.length > 0;
   
   return (
-    <div className="h-screen flex flex-col pt-4 pb-4">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <Card className="w-full flex-1">
-        <CardHeader className="pb-2">
-          <CardTitle>Monthly Statistics: {currentMonth}</CardTitle>
+    <div className="h-screen flex flex-col p-4 overflow-hidden">
+      <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
+      <Card className="w-full flex-1 flex flex-col overflow-hidden">
+        <CardHeader className="py-2">
+          <CardTitle className="text-lg">Monthly Statistics: {currentMonth}</CardTitle>
         </CardHeader>
-        <CardContent className="h-[calc(100%-60px)] overflow-auto">
+        <CardContent className="flex-1 p-3 overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div>
             </div>
           ) : hasStats ? (
-            <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full overflow-hidden">
               {sortedCategories.map(category => (
-                <div key={category} className="space-y-2">
-                  <h3 className="text-lg font-semibold">{category}</h3>
-                  <div className="space-y-2">
+                <div key={category} className="overflow-hidden flex flex-col">
+                  <h3 className="text-md font-semibold mb-1">{category}</h3>
+                  <div className="space-y-1 overflow-auto flex-1">
                     {groupedStats[category].map(stat => (
                       <div 
                         key={stat.id} 
-                        className="flex justify-between items-center p-3 bg-card rounded-lg border"
+                        className="flex justify-between items-center p-2 bg-card rounded-lg border"
                       >
-                        <div className="font-medium">{stat.name}</div>
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        <div className="font-medium text-sm">{stat.name}</div>
+                        <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                           stat.type === 'checkbox' ? 'bg-primary/10 text-primary' :
                           stat.type === 'duration' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500' :
                           'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500'
