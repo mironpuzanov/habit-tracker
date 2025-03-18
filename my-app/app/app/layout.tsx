@@ -21,7 +21,7 @@ export default async function AppLayout({
           <AppSidebar />
         </div>
         <div className="flex-1 flex flex-col pb-20 md:pb-0 px-4 md:px-6 pt-4 md:pt-6">
-          <div className="max-w-4xl mx-auto w-full">
+          <div className="max-w-4xl w-full">
             {children}
           </div>
         </div>
