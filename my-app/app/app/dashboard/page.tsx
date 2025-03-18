@@ -17,12 +17,17 @@ interface HabitStat {
   id: string;
   name: string;
   type: "checkbox" | "duration" | "rating";
+  category: string;
   value: number;
+}
+
+interface GroupedStats {
+  [category: string]: HabitStat[];
 }
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
-  const [habitStats, setHabitStats] = useState<HabitStat[]>([]);
+  const [groupedStats, setGroupedStats] = useState<GroupedStats>({});
   const [currentMonth, setCurrentMonth] = useState<string>(format(new Date(), 'MMMM yyyy'));
   
   const supabase = createClient();
@@ -83,11 +88,26 @@ export default function DashboardPage() {
             id: habit.id,
             name: habit.name,
             type: habit.habit_type,
+            category: habit.category || "Uncategorized",
             value
           };
         });
         
-        setHabitStats(stats);
+        // Group stats by category
+        const grouped: GroupedStats = {};
+        stats.forEach(stat => {
+          if (!grouped[stat.category]) {
+            grouped[stat.category] = [];
+          }
+          grouped[stat.category].push(stat);
+        });
+        
+        // Sort each category's habits alphabetically
+        Object.keys(grouped).forEach(category => {
+          grouped[category].sort((a, b) => a.name.localeCompare(b.name));
+        });
+        
+        setGroupedStats(grouped);
       } catch (error) {
         console.error("Error loading dashboard data:", error);
       } finally {
@@ -111,32 +131,43 @@ export default function DashboardPage() {
     }
   };
   
+  // Sort categories alphabetically
+  const sortedCategories = Object.keys(groupedStats).sort();
+  const hasStats = sortedCategories.length > 0;
+  
   return (
-    <div className="h-screen flex flex-col pt-4">
+    <div className="h-screen flex flex-col pt-4 pb-4">
       <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
-      <Card className="w-full h-full">
-        <CardHeader>
+      <Card className="w-full flex-1">
+        <CardHeader className="pb-2">
           <CardTitle>Monthly Statistics: {currentMonth}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="h-[calc(100%-60px)] overflow-auto">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div>
             </div>
-          ) : habitStats.length > 0 ? (
-            <div className="space-y-4">
-              {habitStats.map(stat => (
-                <div 
-                  key={stat.id} 
-                  className="flex justify-between items-center p-4 bg-card rounded-lg border"
-                >
-                  <div className="font-medium">{stat.name}</div>
-                  <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    stat.type === 'checkbox' ? 'bg-primary/10 text-primary' :
-                    stat.type === 'duration' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500' :
-                    'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500'
-                  }`}>
-                    {formatValue(stat)}
+          ) : hasStats ? (
+            <div className="space-y-6">
+              {sortedCategories.map(category => (
+                <div key={category} className="space-y-2">
+                  <h3 className="text-lg font-semibold">{category}</h3>
+                  <div className="space-y-2">
+                    {groupedStats[category].map(stat => (
+                      <div 
+                        key={stat.id} 
+                        className="flex justify-between items-center p-3 bg-card rounded-lg border"
+                      >
+                        <div className="font-medium">{stat.name}</div>
+                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          stat.type === 'checkbox' ? 'bg-primary/10 text-primary' :
+                          stat.type === 'duration' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500' :
+                          'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500'
+                        }`}>
+                          {formatValue(stat)}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
