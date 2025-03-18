@@ -58,18 +58,22 @@ export function BottomNav() {
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background z-10">
-      <div className="flex justify-around items-center h-16 px-2 max-w-lg mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 border-t bg-background z-10 shadow-lg">
+      <div className="flex justify-around items-center h-16 px-1 max-w-md mx-auto">
         {navItems.map((item) => (
           <Link
             key={item.name}
             href={item.href}
-            className={`flex flex-col items-center justify-center w-16 h-full ${
-              item.active ? "text-primary" : "text-muted-foreground"
+            className={`flex flex-col items-center justify-center py-2 w-full rounded transition-all ${
+              item.active 
+                ? "text-primary font-medium" 
+                : "text-muted-foreground hover:text-foreground/80"
             }`}
           >
-            {item.icon}
-            <span className="text-xs mt-1">{item.name}</span>
+            <div className="flex items-center justify-center">
+              {item.icon}
+            </div>
+            <span className="text-[10px] mt-1 font-medium">{item.name}</span>
           </Link>
         ))}
       </div>

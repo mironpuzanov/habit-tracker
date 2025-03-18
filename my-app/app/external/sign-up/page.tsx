@@ -48,14 +48,14 @@ export default function Page(props: any) {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-[60vh]">
-      <div className="w-full max-w-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
+    <div className="flex justify-center items-center min-h-[60vh] w-full px-4 sm:px-6 md:px-8">
+      <div className="w-full max-w-md bg-background/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-sm p-5 sm:p-6 md:p-8">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Create an Account</h1>
         
         {success ? (
-          <div className="text-center mb-4 p-4 bg-green-100 dark:bg-green-900 rounded">
+          <div className="text-center mb-4 p-3 sm:p-4 bg-green-100 dark:bg-green-900 rounded">
             <p className="text-green-700 dark:text-green-300">{success}</p>
-            <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+            <p className="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400">
               After confirming your email, you can{" "}
               <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
                 sign in
@@ -66,7 +66,7 @@ export default function Page(props: any) {
         ) : (
           <form onSubmit={handleSignUp} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm font-medium">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -74,12 +74,12 @@ export default function Page(props: any) {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="mt-1"
+                className="mt-1 w-full text-sm"
               />
             </div>
             
             <div>
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -88,26 +88,34 @@ export default function Page(props: any) {
                 placeholder="••••••••"
                 minLength={6}
                 required
-                className="mt-1"
+                className="mt-1 w-full text-sm"
               />
               <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
             </div>
             
             {error && (
-              <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-3 rounded">
+              <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 p-3 rounded text-xs sm:text-sm">
                 {error}
               </div>
             )}
             
             <Button
               type="submit"
-              className="w-full"
+              className="w-full mt-2"
               disabled={loading}
             >
-              {loading ? "Creating Account..." : "Sign Up"}
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Creating Account...
+                </span>
+              ) : "Sign Up"}
             </Button>
             
-            <p className="text-center text-sm">
+            <p className="text-center text-xs sm:text-sm mt-4">
               Already have an account?{" "}
               <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
                 Sign in
