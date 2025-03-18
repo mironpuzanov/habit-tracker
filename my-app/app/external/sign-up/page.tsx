@@ -40,7 +40,7 @@ export default function Page(props: any) {
         // Handle both confirmation modes
         if (data.user.identities?.[0]?.identity_data?.email_confirmed_at) {
           // Email confirmation is disabled, user is already confirmed
-          setSuccess("Account created successfully! Redirecting to login...");
+          setSuccess("Account created! Signing you in now...");
           // Auto sign-in since confirmation is disabled
           const { error: signInError } = await supabase.auth.signInWithPassword({
             email,
@@ -69,12 +69,12 @@ export default function Page(props: any) {
   return (
     <div className="flex justify-center items-center min-h-[60vh] w-full px-4 sm:px-6 md:px-8">
       <div className="w-full max-w-md bg-background/50 backdrop-blur-sm rounded-lg border border-border/50 shadow-sm p-5 sm:p-6 md:p-8">
-        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Create an Account</h1>
+        <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">Create Your Account</h1>
         
         {success ? (
           <div className="text-center mb-4 p-3 sm:p-4 bg-green-100 dark:bg-green-900 rounded">
             <p className="text-green-700 dark:text-green-300">{success}</p>
-            {!success.includes("Redirecting") && (
+            {!success.includes("Signing you in") && !success.includes("Please sign in") && (
               <p className="text-xs sm:text-sm mt-2 text-gray-600 dark:text-gray-400">
                 After confirming your email, you can{" "}
                 <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
