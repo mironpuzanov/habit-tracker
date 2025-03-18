@@ -6,12 +6,14 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-export default async function Signup({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+export default async function Signup({ searchParams }: { 
+  searchParams: { [key: string]: string | string[] | undefined } 
+}) {
   // Create a message object from query parameters
   const message: Message | Record<string, never> = searchParams.success
-    ? { success: searchParams.success }
+    ? { success: searchParams.success as string }
     : searchParams.error
-    ? { error: searchParams.error }
+    ? { error: searchParams.error as string }
     : {};
 
   // If we have a success message, show only that
@@ -22,7 +24,7 @@ export default async function Signup({ searchParams }: { searchParams: { [key: s
           <h2 className="text-2xl font-bold mb-2">Thanks for signing up!</h2>
           <p>Please check your email for a verification link.</p>
         </div>
-        <FormMessage message={{ success: searchParams.success }} />
+        <FormMessage message={{ success: searchParams.success as string }} />
         <div className="mt-4">
           <Link className="text-primary underline" href="/external/sign-in">
             Return to sign in
@@ -57,7 +59,7 @@ export default async function Signup({ searchParams }: { searchParams: { [key: s
             Sign up
           </SubmitButton>
           {searchParams.error && (
-            <FormMessage message={{ error: searchParams.error }} />
+            <FormMessage message={{ error: searchParams.error as string }} />
           )}
         </div>
       </form>
