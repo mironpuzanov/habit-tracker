@@ -27,7 +27,6 @@ export default function Page(props: any) {
     try {
       const supabase = createClient();
       
-      // Absolute minimal signup - no options, no redirects
       const { data, error } = await supabase.auth.signUp({
         email,
         password
@@ -38,21 +37,7 @@ export default function Page(props: any) {
       if (error) {
         setError(error.message);
       } else if (data?.user) {
-        setSuccess("Account created successfully! Redirecting to dashboard...");
-        
-        // Try to sign in directly
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        
-        if (!signInError) {
-          // Redirect to dashboard on success
-          setTimeout(() => router.push("/app/dashboard"), 1000);
-        } else {
-          setSuccess("Account created! Please sign in.");
-          setTimeout(() => router.push("/external/sign-in"), 1000);
-        }
+        setSuccess("Account created successfully! Please check your email for confirmation link.");
       }
     } catch (err) {
       console.error("Signup exception:", err);
@@ -70,9 +55,13 @@ export default function Page(props: any) {
         {success ? (
           <div className="text-center mb-4 p-4 bg-green-100 dark:bg-green-900 rounded">
             <p className="text-green-700 dark:text-green-300">{success}</p>
-            <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline mt-2 inline-block">
-              Sign in
-            </Link>
+            <p className="text-sm mt-2 text-gray-600 dark:text-gray-400">
+              After confirming your email, you can{" "}
+              <Link href="/external/sign-in" className="text-blue-600 dark:text-blue-400 underline">
+                sign in
+              </Link>
+              {" "}to your account.
+            </p>
           </div>
         ) : (
           <form onSubmit={handleSignUp} className="space-y-4">
