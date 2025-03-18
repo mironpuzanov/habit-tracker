@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { startOfMonth, endOfMonth, format } from "date-fns";
 
 interface Habit {
@@ -103,7 +103,7 @@ export default function DashboardPage() {
         });
         
         // Sort each category's habits by type first, then by name
-        const typeOrder = { checkbox: 1, duration: 2, rating: 3 };
+        const typeOrder = { checkbox: 1, rating: 2, duration: 3 };
         Object.keys(grouped).forEach(category => {
           grouped[category].sort((a, b) => {
             // First sort by type
@@ -144,30 +144,39 @@ export default function DashboardPage() {
   const hasStats = sortedCategories.length > 0;
   
   return (
-    <div className="h-screen flex flex-col p-4 overflow-hidden">
-      <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
-      <Card className="w-full flex-1 flex flex-col overflow-hidden">
-        <CardHeader className="py-2">
-          <CardTitle className="text-lg">Monthly Statistics: {currentMonth}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 p-3 overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div>
-            </div>
-          ) : hasStats ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-full overflow-hidden">
-              {sortedCategories.map(category => (
-                <div key={category} className="overflow-hidden flex flex-col">
-                  <h3 className="text-md font-semibold mb-1">{category}</h3>
-                  <div className="space-y-1 overflow-auto flex-1">
-                    {groupedStats[category].map(stat => (
+    <div className="h-screen max-h-screen flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between p-2">
+        <h1 className="text-lg font-bold">{currentMonth}</h1>
+      </div>
+      
+      {isLoading ? (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin h-8 w-8 border-4 border-primary rounded-full border-t-transparent"></div>
+        </div>
+      ) : hasStats ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 p-1 h-[calc(100%-40px)] overflow-hidden">
+          {sortedCategories.map(category => (
+            <Card key={category} className="flex flex-col overflow-hidden p-0 h-full">
+              <div className="bg-muted/30 px-2 py-0.5 border-b">
+                <h3 className="text-xs font-semibold">{category}</h3>
+              </div>
+              <CardContent className="p-1 space-y-1 overflow-auto flex-1">
+                {groupedStats[category].map((stat, index, arr) => {
+                  // Check if this is the first item of its type in the array
+                  const isFirstOfType = index === 0 || arr[index-1].type !== stat.type;
+                  
+                  return (
+                    <div key={stat.id}>
+                      {isFirstOfType && (
+                        <div className="text-xs text-muted-foreground mt-0.5 mb-0.5 font-semibold">
+                          {stat.type === 'checkbox' ? 'Checkbox' : stat.type === 'rating' ? 'Rating' : 'Duration'}
+                        </div>
+                      )}
                       <div 
-                        key={stat.id} 
-                        className="flex justify-between items-center p-2 bg-card rounded-lg border"
+                        className="flex justify-between items-center p-1 bg-card rounded border"
                       >
-                        <div className="font-medium text-sm">{stat.name}</div>
-                        <div className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        <div className="font-medium text-xs">{stat.name}</div>
+                        <div className={`px-1 py-0.5 rounded-full text-xs font-medium ${
                           stat.type === 'checkbox' ? 'bg-primary/10 text-primary' :
                           stat.type === 'duration' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-500' :
                           'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-500'
@@ -175,18 +184,18 @@ export default function DashboardPage() {
                           {formatValue(stat)}
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-muted-foreground">No habits data available for this month</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-muted-foreground">No habits data available for this month</p>
+        </div>
+      )}
     </div>
   );
 } 
