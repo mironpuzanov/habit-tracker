@@ -37,7 +37,26 @@ export default function Page(props: any) {
       if (error) {
         setError(error.message);
       } else if (data?.user) {
-        setSuccess("Account created successfully! Please check your email for confirmation link.");
+        // Handle both confirmation modes
+        if (data.user.identities?.[0]?.identity_data?.email_confirmed_at) {
+          // Email confirmation is disabled, user is already confirmed
+          setSuccess("Account created successfully! Redirecting to login...");
+          // Auto sign-in since confirmation is disabled
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (!signInError) {
+            setTimeout(() => router.push("/app/dashboard"), 1500);
+          } else {
+            setSuccess("Account created! Please sign in.");
+            setTimeout(() => router.push("/external/sign-in"), 1500);
+          }
+        } else {
+          // Email confirmation is enabled
+          setSuccess("Account created successfully! Please check your email for confirmation link.");
+        }
       }
     } catch (err) {
       console.error("Signup exception:", err);
