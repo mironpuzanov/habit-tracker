@@ -1,27 +1,28 @@
 import { signUpAction } from "@/app/actions";
-import { FormMessage, Message } from "@/components/form-message";
+import { FormMessage } from "@/components/form-message";
 import { SubmitButton } from "@/components/submit-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-export default function Signup({ 
-  searchParams 
-}: { 
-  searchParams?: { [key: string]: string | string[] | undefined }
+export default function SignUpPage({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const successMessage = searchParams?.success 
-    ? typeof searchParams.success === 'string' 
+  // Extract success/error messages from search params
+  const successMessage = 
+    searchParams.success && 
+    (typeof searchParams.success === 'string' 
       ? searchParams.success 
-      : searchParams.success[0]
-    : null;
+      : searchParams.success[0]);
     
-  const errorMessage = searchParams?.error 
-    ? typeof searchParams.error === 'string' 
+  const errorMessage = 
+    searchParams.error && 
+    (typeof searchParams.error === 'string' 
       ? searchParams.error 
-      : searchParams.error[0]
-    : null;
+      : searchParams.error[0]);
 
   // Handle success message
   if (successMessage) {

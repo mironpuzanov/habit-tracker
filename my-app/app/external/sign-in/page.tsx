@@ -5,16 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
-export default function Login({ 
-  searchParams 
-}: { 
-  searchParams?: { [key: string]: string | string[] | undefined }
+export default function SignInPage({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const errorMessage = searchParams?.error 
-    ? typeof searchParams.error === 'string' 
+  // Extract error message from search params if it exists
+  const errorMessage = 
+    searchParams.error && 
+    (typeof searchParams.error === 'string' 
       ? searchParams.error 
-      : searchParams.error[0]
-    : null;
+      : searchParams.error[0]);
 
   return (
     <form className="flex-1 flex flex-col min-w-64">
