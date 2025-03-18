@@ -16,10 +16,10 @@ export default function LandingHero({
       <p className="text-xl text-foreground/70 max-w-2xl">{subtitle}</p>
       <div className="flex gap-4 mt-6">
         <Button asChild variant="default" size="lg">
-          <Link href="/sign-up">Get Started</Link>
+          <Link href="/external/sign-up">Get Started</Link>
         </Button>
         <Button asChild variant="outline" size="lg">
-          <Link href="/sign-in">Sign In</Link>
+          <Link href="/external/sign-in">Sign In</Link>
         </Button>
       </div>
     </div>
