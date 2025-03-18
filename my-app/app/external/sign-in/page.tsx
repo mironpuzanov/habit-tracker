@@ -5,12 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
-interface PageProps {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
+export default function Login({ 
+  searchParams 
+}: { 
+  searchParams?: { [key: string]: string | string[] | undefined }
+}) {
+  const errorMessage = searchParams?.error 
+    ? typeof searchParams.error === 'string' 
+      ? searchParams.error 
+      : searchParams.error[0]
+    : null;
 
-export default function Login({ searchParams }: PageProps) {
   return (
     <form className="flex-1 flex flex-col min-w-64">
       <h1 className="text-2xl font-medium">Sign in</h1>
@@ -41,8 +46,8 @@ export default function Login({ searchParams }: PageProps) {
         <SubmitButton pendingText="Signing In..." formAction={signInAction}>
           Sign in
         </SubmitButton>
-        {searchParams.error && (
-          <FormMessage message={{ error: typeof searchParams.error === 'string' ? searchParams.error : searchParams.error[0] }} />
+        {errorMessage && (
+          <FormMessage message={{ error: errorMessage }} />
         )}
       </div>
     </form>

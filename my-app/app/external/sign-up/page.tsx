@@ -6,18 +6,25 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-interface PageProps {
-  params: { slug: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-export default function Signup({ searchParams }: PageProps) {
-  // Handle success message
-  if (searchParams.success) {
-    const successMessage = typeof searchParams.success === 'string' 
+export default function Signup({ 
+  searchParams 
+}: { 
+  searchParams?: { [key: string]: string | string[] | undefined }
+}) {
+  const successMessage = searchParams?.success 
+    ? typeof searchParams.success === 'string' 
       ? searchParams.success 
-      : searchParams.success[0];
-      
+      : searchParams.success[0]
+    : null;
+    
+  const errorMessage = searchParams?.error 
+    ? typeof searchParams.error === 'string' 
+      ? searchParams.error 
+      : searchParams.error[0]
+    : null;
+
+  // Handle success message
+  if (successMessage) {
     return (
       <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 p-4">
         <div className="text-center mb-4">
@@ -58,12 +65,8 @@ export default function Signup({ searchParams }: PageProps) {
           <SubmitButton formAction={signUpAction} pendingText="Signing up...">
             Sign up
           </SubmitButton>
-          {searchParams.error && (
-            <FormMessage message={{ 
-              error: typeof searchParams.error === 'string' 
-                ? searchParams.error 
-                : searchParams.error[0] 
-            }} />
+          {errorMessage && (
+            <FormMessage message={{ error: errorMessage }} />
           )}
         </div>
       </form>
