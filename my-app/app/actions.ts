@@ -28,11 +28,15 @@ export const signUpAction = async (formData: FormData) => {
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
+  console.log("Sign up attempt for:", email);
+  console.log("Origin:", origin);
+
   if (!email || !password) {
+    console.log("Missing email or password");
     return redirect(`/external/sign-up?error=${encodeURIComponent("Email and password are required")}`);
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { error, data } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -40,10 +44,13 @@ export const signUpAction = async (formData: FormData) => {
     },
   });
 
+  console.log("Supabase response:", error ? "Error" : "Success", data);
+
   if (error) {
-    console.error(error.code + " " + error.message);
+    console.error("Sign up error:", error.code, error.message);
     return redirect(`/external/sign-up?error=${encodeURIComponent(error.message)}`);
   } else {
+    console.log("Sign up success, user:", data?.user?.id);
     return redirect(`/external/sign-up?success=${encodeURIComponent("Thanks for signing up! Please check your email for a verification link.")}`);
   }
 };

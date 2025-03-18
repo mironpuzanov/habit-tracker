@@ -6,14 +6,28 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
 
-export default async function Signup(props: {
-  searchParams: Promise<Message>;
-}) {
-  const searchParams = await props.searchParams;
-  if ("message" in searchParams) {
+export default async function Signup({ searchParams }: { searchParams: { [key: string]: string | undefined } }) {
+  // Create a message object from query parameters
+  const message: Message | Record<string, never> = searchParams.success
+    ? { success: searchParams.success }
+    : searchParams.error
+    ? { error: searchParams.error }
+    : {};
+
+  // If we have a success message, show only that
+  if (searchParams.success) {
     return (
-      <div className="w-full flex-1 flex items-center h-screen sm:max-w-md justify-center gap-2 p-4">
-        <FormMessage message={searchParams} />
+      <div className="w-full flex-1 flex flex-col items-center justify-center gap-4 p-4">
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold mb-2">Thanks for signing up!</h2>
+          <p>Please check your email for a verification link.</p>
+        </div>
+        <FormMessage message={{ success: searchParams.success }} />
+        <div className="mt-4">
+          <Link className="text-primary underline" href="/external/sign-in">
+            Return to sign in
+          </Link>
+        </div>
       </div>
     );
   }
@@ -42,7 +56,9 @@ export default async function Signup(props: {
           <SubmitButton formAction={signUpAction} pendingText="Signing up...">
             Sign up
           </SubmitButton>
-          <FormMessage message={searchParams} />
+          {searchParams.error && (
+            <FormMessage message={{ error: searchParams.error }} />
+          )}
         </div>
       </form>
       <SmtpMessage />
